@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_settings">الإعدادات</string>
+    <string name="favorites">المفضلة</string>
+    <string name="title_activity_maps">الخريطة</string>
+    <string name="units_title">الوحدات</string>
+    <string name="From">من</string>
+    <string name="to">إلى</string>
+    <string name="map_btn">تاكيد</string>
+    <string name="unit_key">نظام الوحدات</string>
+    <string name="Events">الاحداث</string>
+    <string name="save_add_btn">ظبط</string>
+    <string name="notification">إشعار</string>
+    <string name="alarmSound">منبه</string>
+    <string name="alarm">منبه</string>
+    <string name="alarms_title">المنبهات</string>
+    <string name="soundType">نوع التنبيه</string>
+    <string name="no_alarms">لا يوجد منبهات</string>
+    <string name="description">وصف</string>
+    <string name="dd_mm_yy">dd_mm_yy</string>
+    <string name="Date">اختر تاريخ</string>
+    <string name="Description">وصف</string>
+    <string name="attachment2_language">لغة التطبيق</string>
+    <string name="language_title">اللغة</string>
+    <string name="attachment2_summary">اختر موقع من الخريطة</string>
+    <string name="attachment_title">الموقع</string>
+    <string name="attachment1_title">استخدم موقعك الحالي</string>
+    <string name="attachment_summary">السماح للتطبيق بمعرفة موقعك الحالي</string>
+    <string name="loc_title">الموقع</string>
+    <string name="weather_details">التفاصيل</string>
+    <string name="_7_day_weather_report">نشرة الاسبوع</string>
+    <string name="manage_cities">إدارة المدن</string>
+    <string name="sunrise">الشروق</string>
+    <string name="sunset">الغروب</string>
+    <string name="wind">الرياح</string>
+    <string name="clouds">السحب</string>
+    <string name="pressure">الضغط</string>
+    <string name="humidity">الرطوبة</string>
+    <string name="notification_title">"الحدث: "</string>
+    <string name="notification_body">\"احترس هناك \"</string>
+    <string name="fav_tooltips">اضف مدينة</string>
+    <string name="alarm_tool_tip">اضف منبه</string>
+    <string name="helpInfo">اسحب العنصر لحذفه</string>
+    <string name="empty_date">حدد التاريخ</string>
+    <string name="empty_time">حدد الوقت</string>
+    <string name="Notification_title">الإشعارات</string>
+    <string name="notification_summary">عرض الطقس الحالي كإشعار</string>
+    <string name="check_internet"> تحقق من الاتصال بالانترنت   </string>
+    <string name="delete_default_msg">لا يمكن الحذف</string>
+    <string name="connect">اتصال</string>
+    <string name="cancel">الغاء</string>
+    <string-array name="event_options">
+        <item>مطر</item>
+        <item>ثلوج</item>
+        <item>ضباب</item>
+        <item>عاصفة</item>
+        <item>غيوم</item>
+        <item>رياح</item>
+    </string-array>
+
+    <string-array name="alarm_type">
+        <item>إشعار</item>
+        <item>منبه</item>
+    </string-array>
+    <string name="undo">تراجع</string>
+    <string name="deleted">تم الحذف</string>
+    <string name="validate_time_msg">تاكد من تحديد الوقت الصحيح</string>
+    <string name="add_new_alarm">اضف منبه جديد</string>
+    <string name="choose_place_msg">اختار مكان</string>
+    <string name="dismiss_button">زر الالغاء</string>
+</resources>

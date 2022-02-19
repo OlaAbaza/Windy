@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory android:title="@string/loc_title">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:disableDependentsState="true"
+            android:key="@string/device_location_key"
+            android:summary="@string/attachment_summary"
+            android:title="@string/attachment1_title" />
+        <Preference
+            android:dependency="@string/device_location_key"
+            android:key="@string/custom_location_key"
+            android:summary="@string/attachment2_summary"
+            android:title="@string/attachment_title" />
+        <EditTextPreference
+            android:dependency="@string/device_location_key"
+            android:key="@string/latitude_key"
+            android:summary="%s"
+            app:isPreferenceVisible="false" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/units_title">
+        <ListPreference
+            android:defaultValue="METRIC"
+            android:entries="@array/unitSystemEntries"
+            android:entryValues="@array/unitSystemValues"
+            android:key="@string/attachment_unit_key"
+            android:summary="%s"
+            android:title="@string/unit_key" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/language_title">
+        <ListPreference
+            android:defaultValue="ENGLISH"
+            android:entries="@array/languageSystemEntries"
+            android:entryValues="@array/languageSystemValues"
+            android:key="@string/attachment_language_key"
+            android:summary="%s"
+            android:title="@string/attachment2_language" />
+    </PreferenceCategory>
+</PreferenceScreen>

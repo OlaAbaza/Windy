@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="alarmViewModel"
+            type="com.example.windy.ui.viewModel.AlarmViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/alarm_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/ic_bg_main"
+        android:fitsSystemWindows="true">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="15dp"
+            android:text="@string/alarms_title"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="@dimen/Headline"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/relativeLayout2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/relativeLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@drawable/cardview_bg"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/title">
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/empty_status"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                app:constraint_referenced_ids="img_empty_status,tv_empty_status"
+                app:setGroupVisibility="@{alarmViewModel.alarmList}" />
+
+            <TextView
+                android:id="@+id/tv_empty_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/no_alarms"
+                android:textSize="25sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.6" />
+
+            <ImageView
+                android:id="@+id/img_empty_status"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:layout_centerInParent="true"
+                android:padding="15dp"
+                android:src="@drawable/ic_noalarm"
+                app:layout_constraintBottom_toTopOf="@id/tv_empty_status"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.9" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvAlarms"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginBottom="15dp"
+                android:orientation="vertical"
+                android:visibility="visible"
+                app:alarmListData="@{alarmViewModel.alarmList}"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:listitem="@layout/alarm_item" />
+
+            <ImageView
+                android:id="@+id/addBtn"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:clickable="true"
+                android:contentDescription="@string/add_new_alarm"
+                android:elevation="10dp"
+                android:src="@drawable/ic_addbtn"
+                android:tooltipText="@string/alarm_tool_tip"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

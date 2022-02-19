@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include
+            android:id="@+id/shimmer_layout"
+            layout="@layout/shimmer_placeholder_layout"
+            android:visibility="gone" />
+
+        <include
+            android:id="@+id/weather_details_layout"
+            layout="@layout/weather_details_fragment"
+            android:visibility="gone" />
+
+        <include
+            android:id="@+id/loading_layout"
+            layout="@layout/loading_layout"
+            android:visibility="gone" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

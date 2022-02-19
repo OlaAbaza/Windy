@@ -1,0 +1,277 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="alarm"
+            type="com.example.windy.database.Alarm" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/register_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#F3F2F7"
+        android:focusableInTouchMode="false"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="15dp"
+        app:cardUseCompatPadding="true">
+
+        <ImageView
+            android:id="@+id/closeBtn"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_gravity="end"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="19dp"
+            android:elevation="10dp"
+            android:src="@drawable/ic_baseline_cancel_24" />
+
+        <LinearLayout
+            android:id="@+id/my_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="30dp"
+            android:orientation="vertical">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@color/textview_bg"
+                app:hintTextColor="@color/purple_504">
+
+                <EditText
+                    android:id="@+id/Desc_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="@color/textview_bg"
+                    android:hint="@string/description"
+                    android:inputType="textPersonName"
+                    android:maxLines="1"
+                    android:text="@{alarm.description}"
+                    android:textSize="17sp" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:id="@+id/Date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/Date" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tv_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@drawable/textview_bg"
+                android:padding="5dp"
+                app:hintTextColor="@color/purple_504">
+
+                <TextView
+                    android:id="@+id/calender_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:hint="@string/dd_mm_yy"
+                    android:text="@{alarm.date}"
+                    android:textSize="17sp"
+                    app:drawableRightCompat="@drawable/ic_baseline_date_range_24" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <LinearLayout
+                    android:id="@+id/firstRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:weightSum="2">
+
+                    <TextView
+                        android:id="@+id/fromTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginTop="10dp"
+                        android:text="@string/From" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tv_time_from"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:background="@drawable/textview_bg"
+                        android:padding="5dp"
+                        app:hintTextColor="@color/purple_504">
+
+                        <TextView
+                            android:id="@+id/start_time_btn"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginEnd="10dp"
+                            android:hint="@string/time_hint"
+                            android:text="@{alarm.startTime}"
+                            android:maxLines="1"
+                            android:textSize="17sp"
+                            app:drawableRightCompat="@drawable/ic_baseline_access_alarm_24" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/secondRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:weightSum="2">
+
+                    <TextView
+                        android:id="@+id/toTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginTop="10dp"
+                        android:text="@string/to"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/Desc_tv" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tv_time_to"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:background="@drawable/textview_bg"
+                        android:padding="5dp"
+                        app:hintTextColor="@color/purple_504">
+
+                        <TextView
+                            android:id="@+id/end_time_btn"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginEnd="10dp"
+                            android:hint="@string/time_hint"
+                            android:text="@{alarm.endTime}"
+                            android:maxLines="1"
+                            android:textSize="17sp"
+                            app:drawableRightCompat="@drawable/ic_baseline_access_alarm_24" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+
+                </LinearLayout>
+            </LinearLayout>
+
+
+            <!--LinearLayout
+                android:id="@+id/thirdRow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="2">
+                <CheckBox
+                    android:id="@+id/notification"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/notification"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/secondRow" />
+                <CheckBox
+                    android:id="@+id/loopSound"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/alarmSound" />
+            </LinearLayout-->
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/event"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginTop="10dp"
+                        android:text="@string/Events" />
+
+                    <Spinner
+                        android:id="@+id/event_spinner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:entries="@array/event_options"
+                        android:popupBackground="@color/white" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/soundType"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginTop="10dp"
+                        android:text="@string/soundType" />
+
+                    <Spinner
+                        android:id="@+id/sound_spinner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:entries="@array/alarm_type"
+                        android:popupBackground="@color/white" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/add_alarm_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="21dp"
+                android:background="@drawable/fav_cards"
+                android:text="@string/save_add_btn" />
+
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+</layout>

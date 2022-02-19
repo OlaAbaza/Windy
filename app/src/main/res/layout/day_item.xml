@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="weatherDaily"
+            type="com.example.windy.domain.Daily" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="6">
+
+        <TextView
+            android:id="@+id/dailyDay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="10dp"
+            android:layout_weight="4"
+            android:fontFamily="@font/noto_sans"
+            android:textColor="@color/hour_text"
+            android:textSize="15sp"
+            android:text="@{weatherDaily.date}"
+            tools:text="Friday,5 Dec " />
+
+        <TextView
+            android:id="@+id/temp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="5dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/noto_sans"
+            android:gravity="end"
+            tools:text="19°/67°"
+            android:textColor="@color/hour_text"
+            android:textSize="15sp"
+            app:dailyMaxTempString="@{weatherDaily}" />
+
+        <ImageView
+            android:id="@+id/imgDay"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="5dp"
+            android:layout_weight="1"
+            app:setSrcImage="@{weatherDaily.weather.get(0).icon}"
+            app:tint="@color/hour_text"
+            tools:src="@drawable/ic_baseline_wb_sunny_24" />
+
+    </LinearLayout>
+</layout>

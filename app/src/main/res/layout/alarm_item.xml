@@ -1,0 +1,81 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="alarm"
+            type="com.example.windy.database.Alarm" />
+
+        <variable
+            name="clickListener"
+            type="com.example.windy.adapter.AlarmListAdapter.AlarmListener" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@drawable/cardview_bg1"
+        android:paddingBottom="10dp">
+
+
+        <TextView
+            android:id="@+id/alarmType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{alarm.event}"
+            android:textColor="@color/purple_504"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/edit_btn"
+            app:layout_constraintHorizontal_bias="0.1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.198"
+            tools:text="Event name" />
+
+        <ImageView
+            android:id="@+id/edit_btn"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_margin="10dp"
+            android:onClick="@{()->clickListener.onClick(alarm)}"
+            android:src="@drawable/ic_baseline_edit_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.802"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <TextView
+            android:id="@+id/tv_date_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="20dp"
+            android:textColor="@color/purple_504"
+            android:textSize="10sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edit_btn"
+            app:setDateAndTime="@{alarm}"
+            tools:text="10.9.2012 5:49to6:49" />
+
+        <TextView
+            android:id="@+id/details"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="15dp"
+            android:text="@{alarm.description}"
+            android:textColor="@color/purple_504"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/alarmType"
+            tools:text="Tree club" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

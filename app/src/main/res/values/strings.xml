@@ -1,0 +1,110 @@
+<resources>
+    <string name="app_name" translatable="false">Windy</string>
+    <string name="action_settings">Settings</string>
+    <string name="favorites">Favorites</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_settings" translatable="false">SettingsActivity</string>
+
+
+    <!-- Units Preferences -->
+    <string name="units_title">Units</string>
+    <string name="attachment_unit_key" translatable="false">UNIT_SYSTEM</string>
+    <string name="unit_key">Unit system</string>
+    <string name="unit_metric_summary" translatable="false"> Temp in Celsius and wind speed in meter/sec</string>
+    <string name="unit_imperial_summary" translatable="false"> Temp in Fahrenheit and wind speed in miles/hour</string>
+    <!--metric  Temp in Celsius and wind speed in meter/sec
+    imperial in Fahrenheit and wind speed in miles/hour,-->
+    <!-- Location Preferences -->
+    <string name="loc_title">Weather Location</string>
+    <string name="attachment_summary">Allow the app to get your location</string>
+    <string name="attachment_title">Use device location</string>
+    <string name="attachment1_title">Location</string>
+    <string name="attachment2_summary">The location for which the weather is displayed</string>
+    <!--language Preferences -->
+    <string name="language_title">language</string>
+    <string name="attachment_language_key" translatable="false">APP_LANG</string>
+    <string name="attachment2_language">App language</string>
+
+
+    <string name="Description">Description</string>
+    <string name="Date">Choose Date</string>
+    <string name="From">From</string>
+    <string name="to">To</string>
+    <string name="Events">Events</string>
+    <string name="save_add_btn">Set Alarm</string>
+    <string name="notification">Notification</string>
+    <string name="alarmSound">Alarm</string>
+    <string name="soundType">Sound Type</string>
+    <string name="alarm">Alarm</string>
+    <string name="latitude_key" translatable="false">latitude</string>
+    <string name="alarms_title">Alarms</string>
+    <string name="no_alarms">No Alarms</string>
+    <string name="description">Description</string>
+    <string name="dd_mm_yy">DD/MM/YY</string>
+    <string name="map_btn">Confirm</string>
+    <string name="weather_details">Weather Details</string>
+    <string name="_7_day_weather_report">7-day weather report</string>
+    <string name="manage_cities">Manage cities</string>
+    <string name="sunrise">Sunrise</string>
+    <string name="sunset">Sunset</string>
+    <string name="wind">Wind</string>
+    <string name="clouds">Clouds</string>
+    <string name="pressure">Pressure</string>
+    <string name="humidity">Humidity</string>
+    <string name="notification_title">"Alert: "</string>
+    <string name="notification_body">\"Be aware there is \"</string>
+    <string name="fav_tooltips">Add city</string>
+    <string name="alarm_tool_tip">Add alarm</string>
+    <string name="helpInfo">swipe to delete</string>
+    <string name="temp" translatable="false">"%s°"</string>
+    <string name="max_min_temp" translatable="false">"%s°/%s°"</string>
+    <string name="date_time" translatable="false">"%s %s to %s"</string>
+    <string name="slash_delimiter" translatable="false">"/"</string>
+    <string name="check_internet">Please check your Internet Connection </string>
+    <string name="connect">Connect</string>
+    <string name="cancel">Cancel</string>
+    <string name="weather_notification_channel_description" translatable="false">weather alert reminder</string>
+
+    <string-array name="event_options">
+        <item>Rain</item>
+        <item>snow</item>
+        <item>fog</item>
+        <item>thunderstorm</item>
+        <item>cloud</item>
+        <item>wind</item>
+    </string-array>
+
+    <string-array name="alarm_type">
+        <item>Notification</item>
+        <item>Alarm</item>
+    </string-array>
+    <string-array name="maps_options">
+        <item>rain</item>
+        <item>clouds</item>
+        <item>precipitation</item>
+        <item>pressure</item>
+        <item>temp</item>
+        <item>snow</item>
+        <item>wind</item>
+    </string-array>
+
+    <string name="empty_date">Date is empty</string>
+    <string name="empty_time">Time is empty</string>
+    <string name="Notification_title">Notifications</string>
+    <string name="notification_summary">Show Current Weather as notification</string>
+    <string name="dismiss_button">dismiss button</string>
+    <string name="choose_place_msg">please select place</string>
+    <string name="time_hint" translatable="false">00:00</string>
+    <string name="add_new_alarm">add new alarm</string>
+    <string name="validate_time_msg">Please Make Sure Your Timing is correct</string>
+    <string name="undo">UNDO</string>
+    <string name="deleted">Deleted</string>
+    <string name="custom_location_key" translatable="false">CUSTOM_LOCATION</string>
+    <string name="device_location_key" translatable="false">USE_DEVICE_LOCATION</string>
+    <string name="notification_key" translatable="false">NOTIFICATION</string>
+    <string name="delete_default_msg">You Can not delete the default Weather</string>
+    <string name="time_format">HH:mm</string>
+    <string name="date_format">dd/MM/yyyy</string>
+
+
+</resources>
