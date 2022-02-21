@@ -1,4 +1,4 @@
-package com.example.windy.database
+package com.example.windy.models
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

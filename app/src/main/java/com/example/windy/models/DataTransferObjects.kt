@@ -1,6 +1,5 @@
-package com.example.windy.network
+package com.example.windy.models
 
-import com.example.windy.database.*
 import com.squareup.moshi.Json
 
 data class NetworkWeatherConditions(

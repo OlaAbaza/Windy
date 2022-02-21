@@ -8,7 +8,7 @@
 
         <variable
             name="weatherHourly"
-            type="com.example.windy.domain.Hourly" />
+            type="com.example.windy.models.domain.Hourly" />
     </data>
 
 <LinearLayout android:layout_width="wrap_content"

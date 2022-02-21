@@ -12,6 +12,8 @@ import android.media.RingtoneManager
 import androidx.core.app.NotificationCompat
 import com.example.windy.R
 import com.example.windy.ui.fragment.WeatherDetailsFragment
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
 
 private const val WEATHER_NOTIFICATION_CHANNEL_ID = "weather_channel"
@@ -19,7 +21,7 @@ private const val WEATHER_NOTIFICATION_CHANNEL_NAME = "Weather"
 private const val NOTIFICATION_ID = 1
 
 
-class NotificationUtils(private val context: Context) {
+class NotificationUtils @Inject constructor(@ApplicationContext val context: Context) {
     private var notificationManager: NotificationManager? = null
 
     init {

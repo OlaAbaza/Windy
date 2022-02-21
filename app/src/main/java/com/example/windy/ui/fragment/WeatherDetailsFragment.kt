@@ -2,7 +2,6 @@ package com.example.windy.ui.fragment
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -16,47 +15,61 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.windy.R.*
-import com.example.windy.adapter.DailyListAdapter
-import com.example.windy.adapter.HourlyListAdapter
-import com.example.windy.database.WeatherDatabase
 import com.example.windy.databinding.WeatherDetailsLayoutBinding
-import com.example.windy.domain.CurrentLocation
+import com.example.windy.extensions.makeGone
+import com.example.windy.extensions.makeVisible
+import com.example.windy.extensions.showCheckNetworkDialog
+import com.example.windy.models.domain.Alert
+import com.example.windy.models.domain.CurrentLocation
 import com.example.windy.network.WeatherApiFilter
+import com.example.windy.ui.adapter.DailyListAdapter
+import com.example.windy.ui.adapter.HourlyListAdapter
 import com.example.windy.ui.viewModel.WeatherDetailsViewModel
-import com.example.windy.util.Constant
-import com.example.windy.util.SharedPreferenceUtil
-import com.example.windy.util.isConnected
+import com.example.windy.util.*
 import com.google.android.gms.location.*
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import java.util.*
+import javax.inject.Inject
 
 
 private const val PERMISSION_ID = 42
 
+@AndroidEntryPoint
+//create a dependencies container that is attached to the fragment
 class WeatherDetailsFragment : Fragment() {
 
-    private val viewModel by lazy {
-        val application = requireNotNull(activity).application
-        val weatherDatabase = WeatherDatabase.getInstance(application)
-        ViewModelProvider(this, WeatherDetailsViewModel.Factory(weatherDatabase)).get(
-            WeatherDetailsViewModel::class.java
-        )
-    }
+    @Inject
+    lateinit var sharedPreferenceUtil: SharedPreferenceUtil
+
+    @Inject
+    lateinit var hourlyListAdapter: HourlyListAdapter
+
+    @Inject
+    lateinit var dailyListAdapter: DailyListAdapter
+
+    @Inject
+    lateinit var notificationUtilsUtils: NotificationUtils
+
     private lateinit var binding: WeatherDetailsLayoutBinding
-    private val sharedPreferenceUtil by lazy {
-        context?.run { SharedPreferenceUtil(this) }
-    }
+
     private var getCurrentLocation = MutableLiveData<CurrentLocation?>()
+
+    private val viewModel: WeatherDetailsViewModel by viewModels()
+
+
     private val mFusedLocationClient by lazy {
         LocationServices.getFusedLocationProviderClient(this.requireActivity())
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        sharedPreferenceUtil?.saveIsFirstTimeLunch(true)
+        sharedPreferenceUtil.saveIsFirstTimeLunch(true)
 
     }
 
@@ -64,8 +77,6 @@ class WeatherDetailsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val hourlyListAdapter = HourlyListAdapter()
-        val dailyListAdapter = DailyListAdapter()
 
         binding = WeatherDetailsLayoutBinding.inflate(inflater)
 
@@ -86,13 +97,13 @@ class WeatherDetailsFragment : Fragment() {
         handleNavigation()
         addObservers()
 
-        if (sharedPreferenceUtil?.getIsFirstTimeLunch() == true) {
-            sharedPreferenceUtil?.saveIsFirstTimeLunch(false)
+        if (sharedPreferenceUtil.getIsFirstTimeLunch()) {
+            sharedPreferenceUtil.saveIsFirstTimeLunch(false)
             getDefaultWeatherData()
         }
-        if (sharedPreferenceUtil?.getIsLocationNeedUpdate() == true) {
+        if (sharedPreferenceUtil.getIsLocationNeedUpdate()) {
             getDefaultWeatherData()
-            sharedPreferenceUtil?.saveIsLocationNeedUpdate(false)
+            sharedPreferenceUtil.saveIsLocationNeedUpdate(false)
         }
         updateAllData()
 
@@ -101,8 +112,8 @@ class WeatherDetailsFragment : Fragment() {
 
     private fun startLoading() {
         binding.apply {
-            loadingLayout.visibility = View.VISIBLE
-            weatherDetailsLayout.root.visibility = View.GONE
+            loadingLayout.makeVisible()
+            weatherDetailsLayout.root.makeGone()
         }
 
     }
@@ -116,13 +127,12 @@ class WeatherDetailsFragment : Fragment() {
     }
 
     private fun getDefaultWeatherData() {
-        if (sharedPreferenceUtil?.getIsUseDeviceLocation() == true
-            && context?.let { isConnected(it) } == true
+        if (sharedPreferenceUtil.getIsUseDeviceLocation() && context?.let { isConnected(it) } == true
         ) {
             getLastLocation()
 
         } else {
-            sharedPreferenceUtil?.getTimeZone()?.let { viewModel.getObjByTimezone(it) }
+            sharedPreferenceUtil.getTimeZone()?.let { viewModel.getObjByTimezone(it) }
         }
     }
 
@@ -163,23 +173,7 @@ class WeatherDetailsFragment : Fragment() {
         if (context?.let { isConnected(it) } == true)
             onSuccess.invoke()
         else
-            showCheckNetworkDialog()
-    }
-
-
-    private fun showCheckNetworkDialog() {
-        val builder = AlertDialog.Builder(requireActivity())
-        builder.setMessage(getString(string.check_internet))
-            .setCancelable(false)
-            .setPositiveButton(getString(string.connect)) { dialog, _ ->
-                startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
-
-                dialog.dismiss()
-            }
-            .setNegativeButton(getString(string.cancel)) { dialog, _ ->
-                dialog.dismiss()
-            }
-            .show()
+            requireActivity().showCheckNetworkDialog()
     }
 
     private fun addObservers() {
@@ -189,35 +183,65 @@ class WeatherDetailsFragment : Fragment() {
                     viewModel.getWeatherData(
                         it.latitude,
                         it.longitude,
-                        sharedPreferenceUtil?.getLanguage() ?: WeatherApiFilter.ENGLISH.value,
-                        sharedPreferenceUtil?.getTempUnit() ?: WeatherApiFilter.IMPERIAL.value
+                        sharedPreferenceUtil.getLanguage() ?: WeatherApiFilter.ENGLISH.value,
+                        sharedPreferenceUtil.getTempUnit() ?: WeatherApiFilter.IMPERIAL.value
                     )
                 }
                 getCurrentLocation.value = null
             }
         })
-        viewModel.getDefaultWeatherCondition.observe(viewLifecycleOwner, { item ->
-            item?.let {
-                sharedPreferenceUtil?.saveTimeZone(it.timezone)
-                binding.weatherDetailsLayout.apply {
-                    weatherConditionItem = it
-                    layoutWeatherDetailsContent.weatherConditionItem = it
-                    swipeRefreshLayout.isRefreshing = false
+        lifecycleScope.launchWhenStarted {
+            viewModel.getDefaultWeatherCondition.collectLatest { response ->
+                when (response) {
+                    is Resource.Success -> {
+                        stopLoading()
+
+                        response.data.apply item@{
+                            sharedPreferenceUtil.saveTimeZone(timezone)
+                            binding.weatherDetailsLayout.apply {
+                                weatherConditionItem = this@item
+                                layoutWeatherDetailsContent.weatherConditionItem = this@item
+                                swipeRefreshLayout.isRefreshing = false
+                                if (!(alerts.isNullOrEmpty()))
+                                    notifyUser(alerts)
+                            }
+                        }
+                    }
+                    is Resource.Loading -> {
+                        startLoading()
+                    }
+                    is Resource.Error -> {
+                        stopLoading()
+//                        response.message.let { message ->
+//                            binding.progressBar.hide()
+//                            context?.toast(message.toString())
+//                        }
+                    }
                 }
-                stopLoading()
+
 
             }
-        })
+        }
+    }
+
+    private fun notifyUser(alert: List<Alert>) {
+        notificationUtilsUtils.sendNotification(
+            alert[0].event ?: "",
+            alert[0].startTime + "," + alert[0].endTime +
+                    "\n" + alert[0].description,
+            isAlarmSound = false,
+            isCancelable = true,
+            notificationId = Constant.WEATHER_ALERT_NOTIFICATION_ID
+        )
     }
 
     private fun updateAllData() {
-        if (sharedPreferenceUtil?.getIsDataNeedUpdate() == true && context?.let { isConnected(it) } == true) {
+        if (sharedPreferenceUtil.getIsDataNeedUpdate() && context?.let { isConnected(it) } == true) {
             viewModel.updateAllWeatherData(
-                sharedPreferenceUtil?.getLanguage() ?: WeatherApiFilter.ENGLISH.value,
-                sharedPreferenceUtil?.getTempUnit() ?: WeatherApiFilter.IMPERIAL.value
+                sharedPreferenceUtil.getLanguage() ?: WeatherApiFilter.ENGLISH.value,
+                sharedPreferenceUtil.getTempUnit() ?: WeatherApiFilter.IMPERIAL.value
             )
-            // activity?.recreate()
-            sharedPreferenceUtil?.saveIsDataNeedUpdate(false)
+            sharedPreferenceUtil.saveIsDataNeedUpdate(false)
         }
     }
 
@@ -317,6 +341,4 @@ class WeatherDetailsFragment : Fragment() {
             }
         }
     }
-////////////////////////////////////////////////////////
-
 }

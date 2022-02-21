@@ -3,8 +3,12 @@ package com.example.windy.util
 import android.content.Context
 import androidx.preference.PreferenceManager
 import com.example.windy.network.WeatherApiFilter
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class SharedPreferenceUtil(context: Context) {
+@Singleton
+class SharedPreferenceUtil @Inject constructor(@ApplicationContext context: Context) {
     private val sharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(context)
     private val editor = sharedPreferences.edit()

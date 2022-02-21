@@ -1,9 +1,9 @@
-package com.example.windy.database
+package com.example.windy.models
 
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.windy.domain.*
+import com.example.windy.models.domain.*
 import kotlinx.serialization.Serializable
 
 

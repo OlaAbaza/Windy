@@ -1,15 +1,16 @@
-package com.example.windy.adapter
+package com.example.windy.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.windy.databinding.HourItemBinding
-import com.example.windy.domain.Hourly
+import com.example.windy.databinding.DayItemBinding
+import com.example.windy.models.domain.Daily
+import javax.inject.Inject
 
-class HourlyListAdapter : ListAdapter<Hourly,
-        HourlyListAdapter.ViewHolder>(WeatherHourlyDiffCallback()) {
+class DailyListAdapter @Inject constructor() : ListAdapter<Daily,
+        DailyListAdapter.ViewHolder>(WeatherDailyDiffCallback()) {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
@@ -20,18 +21,18 @@ class HourlyListAdapter : ListAdapter<Hourly,
         return ViewHolder.from(parent)
     }
 
-    class ViewHolder private constructor(val binding: HourItemBinding)
-        : RecyclerView.ViewHolder(binding.root) {
+    class ViewHolder private constructor(val binding: DayItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: Hourly) {
-            binding.weatherHourly = item
+        fun bind(item: Daily) {
+            binding.weatherDaily = item
             binding.executePendingBindings()
         }
 
         companion object {
             fun from(parent: ViewGroup): ViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
-                val binding = HourItemBinding.inflate(layoutInflater, parent, false)
+                val binding = DayItemBinding.inflate(layoutInflater, parent, false)
 
                 return ViewHolder(binding)
             }
@@ -45,12 +46,12 @@ class HourlyListAdapter : ListAdapter<Hourly,
  * Used by ListAdapter to calculate the minimum number of changes between and old list and a new
  * list that's been passed to `submitList`.
  */
-class WeatherHourlyDiffCallback : DiffUtil.ItemCallback<Hourly>() {
-    override fun areItemsTheSame(oldItem: Hourly, newItem: Hourly): Boolean {
+class WeatherDailyDiffCallback : DiffUtil.ItemCallback<Daily>() {
+    override fun areItemsTheSame(oldItem: Daily, newItem: Daily): Boolean {
         return oldItem == newItem
     }
 
-    override fun areContentsTheSame(oldItem: Hourly, newItem: Hourly): Boolean {
+    override fun areContentsTheSame(oldItem: Daily, newItem: Daily): Boolean {
         return oldItem == newItem
     }
 }

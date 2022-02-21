@@ -1,16 +1,15 @@
-package com.example.windy.adapter
+package com.example.windy.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.windy.databinding.FavItemBinding
-import com.example.windy.domain.WeatherConditions
+import com.example.windy.databinding.AlarmItemBinding
+import com.example.windy.models.Alarm
 
-class FavoriteListAdapter(private val clickListener: FavoriteListener) :
-    ListAdapter<WeatherConditions,
-            FavoriteListAdapter.ViewHolder>(WeatherFavoriteDiffCallback()) {
+class AlarmListAdapter(private val clickListener: AlarmListener) : ListAdapter<Alarm,
+        AlarmListAdapter.ViewHolder>(AlarmDiffCallback()) {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
@@ -21,11 +20,11 @@ class FavoriteListAdapter(private val clickListener: FavoriteListener) :
         return ViewHolder.from(parent)
     }
 
-    class ViewHolder private constructor(val binding: FavItemBinding) :
+    class ViewHolder private constructor(val binding: AlarmItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(clickListener: FavoriteListener, item: WeatherConditions) {
-            binding.weatherConditions = item
+        fun bind(clickListener: AlarmListener, item: Alarm) {
+            binding.alarm = item
             binding.clickListener = clickListener
             binding.executePendingBindings()
         }
@@ -33,17 +32,16 @@ class FavoriteListAdapter(private val clickListener: FavoriteListener) :
         companion object {
             fun from(parent: ViewGroup): ViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
-                val binding = FavItemBinding.inflate(layoutInflater, parent, false)
+                val binding = AlarmItemBinding.inflate(layoutInflater, parent, false)
 
                 return ViewHolder(binding)
             }
         }
     }
 
-    class FavoriteListener(val clickListener: (weatherConditions: WeatherConditions) -> Unit) {
-        fun onClick(weatherConditions: WeatherConditions) = clickListener(weatherConditions)
+    class AlarmListener(val clickListener: (alarm: Alarm) -> Unit) {
+        fun onClick(alarm: Alarm) = clickListener(alarm)
     }
-
 }
 
 /**
@@ -52,15 +50,12 @@ class FavoriteListAdapter(private val clickListener: FavoriteListener) :
  * Used by ListAdapter to calculate the minimum number of changes between and old list and a new
  * list that's been passed to `submitList`.
  */
-class WeatherFavoriteDiffCallback : DiffUtil.ItemCallback<WeatherConditions>() {
-    override fun areItemsTheSame(oldItem: WeatherConditions, newItem: WeatherConditions): Boolean {
-        return oldItem.timezone == newItem.timezone
+class AlarmDiffCallback : DiffUtil.ItemCallback<Alarm>() {
+    override fun areItemsTheSame(oldItem: Alarm, newItem: Alarm): Boolean {
+        return oldItem.id == newItem.id
     }
 
-    override fun areContentsTheSame(
-        oldItem: WeatherConditions,
-        newItem: WeatherConditions
-    ): Boolean {
+    override fun areContentsTheSame(oldItem: Alarm, newItem: Alarm): Boolean {
         return oldItem == newItem
     }
 }

@@ -6,7 +6,7 @@
 
         <variable
             name="weatherConditions"
-            type="com.example.windy.domain.WeatherConditions" />
+            type="com.example.windy.models.domain.WeatherConditions" />
 
     </data>
 

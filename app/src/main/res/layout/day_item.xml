@@ -7,7 +7,7 @@
 
         <variable
             name="weatherDaily"
-            type="com.example.windy.domain.Daily" />
+            type="com.example.windy.models.domain.Daily" />
     </data>
 
     <LinearLayout

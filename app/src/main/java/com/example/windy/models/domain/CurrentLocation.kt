@@ -1,4 +1,4 @@
-package com.example.windy.domain
+package com.example.windy.models.domain
 
 data class CurrentLocation(
     var latitude: Double = 0.0,

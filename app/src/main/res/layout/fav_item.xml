@@ -7,11 +7,11 @@
 
         <variable
             name="weatherConditions"
-            type="com.example.windy.domain.WeatherConditions" />
+            type="com.example.windy.models.domain.WeatherConditions" />
 
         <variable
             name="clickListener"
-            type="com.example.windy.adapter.FavoriteListAdapter.FavoriteListener" />
+            type="com.example.windy.ui.adapter.FavoriteListAdapter.FavoriteListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -33,11 +33,11 @@
             android:textColor="@color/white"
             android:textSize="19sp"
             android:textStyle="normal"
+            app:delimiter="@{@string/slash_delimiter}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:stringToSplit="@{weatherConditions.timezone}"
-            app:delimiter="@{@string/slash_delimiter}"/>
+            app:stringToSplit="@{weatherConditions.timezone}" />
 
         <ImageView
             android:id="@+id/current_loc"

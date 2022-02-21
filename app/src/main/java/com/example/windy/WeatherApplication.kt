@@ -3,12 +3,16 @@ package com.example.windy
 import android.app.Application
 import androidx.work.*
 import com.example.windy.workManger.RefreshDataWorker
+import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
+@HiltAndroidApp
+//triggers Hilt's code generation, including a base class for your application that can use
+//dependency injection. The application container is the parent container for the app,
 class WeatherApplication : Application() {
     private val applicationScope = CoroutineScope(Dispatchers.Default)
 

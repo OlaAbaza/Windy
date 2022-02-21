@@ -6,11 +6,11 @@
 
         <variable
             name="alarm"
-            type="com.example.windy.database.Alarm" />
+            type="com.example.windy.models.Alarm" />
 
         <variable
             name="clickListener"
-            type="com.example.windy.adapter.AlarmListAdapter.AlarmListener" />
+            type="com.example.windy.ui.adapter.AlarmListAdapter.AlarmListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -1,12 +1,10 @@
 package com.example.windy.receiver
 
-import android.app.Application
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.example.windy.R
-import com.example.windy.database.WeatherDatabase
-import com.example.windy.domain.WeatherConditions
+import com.example.windy.models.domain.WeatherConditions
 import com.example.windy.repository.WeatherRepository
 import com.example.windy.util.Constant.ALARM_END_TIME
 import com.example.windy.util.Constant.ALARM_ID
@@ -15,22 +13,25 @@ import com.example.windy.util.Constant.SOUND
 import com.example.windy.util.NotificationUtils
 import com.example.windy.util.SharedPreferenceUtil
 import com.example.windy.util.cancelAlarm
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class AlarmReceiver : BroadcastReceiver() {
-    private lateinit var sharedPreferences: SharedPreferenceUtil
-    private lateinit var notificationUtilsUtils: NotificationUtils
+    @Inject
+    lateinit var sharedPreferences: SharedPreferenceUtil
+
+    @Inject
+    lateinit var repository: WeatherRepository
+
+    @Inject
+    lateinit var notificationUtilsUtils: NotificationUtils
 
     override fun onReceive(context: Context, intent: Intent) {
-        notificationUtilsUtils = NotificationUtils(context)
-        sharedPreferences = SharedPreferenceUtil(context)
-
-        val application = context.applicationContext as Application
-        val weatherDatabase = WeatherDatabase.getInstance(application)
-        val repository = WeatherRepository(weatherDatabase)
 
         val alarmEndTime = intent.getLongExtra(ALARM_END_TIME, 0)
         val alarmId = intent.getIntExtra(ALARM_ID, 0)
@@ -47,11 +48,9 @@ class AlarmReceiver : BroadcastReceiver() {
         } else {
             val timeZone = sharedPreferences.getTimeZone()
             var weatherConditionsItem: WeatherConditions? = null
-
             val jop = CoroutineScope(Dispatchers.IO).launch {
-                weatherConditionsItem = timeZone?.let { repository.getObjByTimezone(it) }
+                weatherConditionsItem = timeZone?.let { repository.getObjByTimezone(it).data }
             }
-
             jop.invokeOnCompletion {
                 val weatherDesc = weatherConditionsItem?.current?.weather?.get(0)?.description
 
@@ -65,7 +64,9 @@ class AlarmReceiver : BroadcastReceiver() {
                     )
                 }
             }
-        }
-    }
 
+        }
+
+    }
 }
+

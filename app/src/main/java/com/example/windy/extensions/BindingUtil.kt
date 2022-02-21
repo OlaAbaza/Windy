@@ -1,6 +1,5 @@
-package com.example.windy.util
+package com.example.windy.extensions
 
-import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.Group
@@ -8,20 +7,16 @@ import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.windy.R
-import com.example.windy.adapter.AlarmListAdapter
-import com.example.windy.adapter.DailyListAdapter
-import com.example.windy.adapter.FavoriteListAdapter
-import com.example.windy.adapter.HourlyListAdapter
-import com.example.windy.database.Alarm
-import com.example.windy.domain.Daily
-import com.example.windy.domain.Hourly
-import com.example.windy.domain.WeatherConditions
+import com.example.windy.models.Alarm
+import com.example.windy.models.domain.Daily
+import com.example.windy.models.domain.Hourly
+import com.example.windy.models.domain.WeatherConditions
+import com.example.windy.ui.adapter.AlarmListAdapter
+import com.example.windy.ui.adapter.DailyListAdapter
+import com.example.windy.ui.adapter.FavoriteListAdapter
+import com.example.windy.ui.adapter.HourlyListAdapter
+import com.example.windy.util.getImgUrl
 
-
-@BindingAdapter("goneIfNotNull")
-fun goneIfNotNull(view: View, it: Any?) {
-    view.visibility = if (it != null) View.GONE else View.VISIBLE
-}
 
 @BindingAdapter(value = ["stringToSplit", "delimiter"], requireAll = true)
 fun TextView.splitText(stringToSplit: String, delimiter: String) {
@@ -136,8 +131,8 @@ fun RecyclerView.bindAlarmRecyclerView(data: List<Alarm>?) {
 @BindingAdapter("setGroupVisibility")
 fun Group.bindGroupVisibility(data: List<Alarm>?) {
     if (data.isNullOrEmpty())
-        this.visibility = View.VISIBLE
+        this.makeVisible()
     else
-        this.visibility = View.GONE
+        this.makeGone()
 
 }

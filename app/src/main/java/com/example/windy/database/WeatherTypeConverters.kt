@@ -1,6 +1,10 @@
 package com.example.windy.database
 
 import androidx.room.TypeConverter
+import com.example.windy.models.DatabaseAlert
+import com.example.windy.models.DatabaseDaily
+import com.example.windy.models.DatabaseHourly
+import com.example.windy.models.DatabaseWeather
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString

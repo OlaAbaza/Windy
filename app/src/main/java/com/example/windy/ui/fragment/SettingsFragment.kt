@@ -4,34 +4,31 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import com.example.windy.MainActivity
 import com.example.windy.R
-import com.example.windy.database.WeatherDatabase
 import com.example.windy.network.WeatherApiFilter
+import com.example.windy.ui.MainActivity
 import com.example.windy.ui.viewModel.SettingViewModel
 import com.example.windy.util.Constant
+import com.example.windy.util.Resource
 import com.example.windy.util.SharedPreferenceUtil
 import com.example.windy.util.isConnected
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class SettingsFragment : PreferenceFragmentCompat(),
     SharedPreferences.OnSharedPreferenceChangeListener {
+    private val viewModel: SettingViewModel by viewModels()
 
-    private val viewModel by lazy {
-        val application = requireNotNull(activity).application
-        val weatherDatabase = WeatherDatabase.getInstance(application)
-        ViewModelProvider(this, SettingViewModel.Factory(weatherDatabase)).get(
-            SettingViewModel::class.java
-        )
-    }
-    private val sharedPreferenceUtil by lazy {
-        context?.run { SharedPreferenceUtil(this) }
-    }
+    @Inject
+    lateinit var sharedPreferenceUtil: SharedPreferenceUtil
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
@@ -43,9 +40,9 @@ class SettingsFragment : PreferenceFragmentCompat(),
                 viewModel.getWeatherData(
                     arguments.lat,
                     arguments.lon,
-                    sharedPreferenceUtil?.getLanguage()
+                    sharedPreferenceUtil.getLanguage()
                         ?: WeatherApiFilter.ENGLISH.value,
-                    sharedPreferenceUtil?.getTempUnit()
+                    sharedPreferenceUtil.getTempUnit()
                         ?: WeatherApiFilter.IMPERIAL.value
                 )
             }
@@ -64,11 +61,21 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.getSelectedTimeZone.observe(viewLifecycleOwner, { timeZone ->
-            sharedPreferenceUtil?.saveTimeZone(timeZone ?: "")
-            sharedPreferenceUtil?.saveIsLocationNeedUpdate(true)
+        lifecycleScope.launchWhenStarted {
+            viewModel.getSelectedTimeZone.collectLatest { response ->
+                when (response) {
+                    is Resource.Success -> {
+                        response.data.apply {
+                            sharedPreferenceUtil.saveTimeZone(this.timezone)
+                            sharedPreferenceUtil.saveIsLocationNeedUpdate(true)
+                        }
 
-        })
+                    }
+                    else -> {}
+                }
+
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,16 +87,17 @@ class SettingsFragment : PreferenceFragmentCompat(),
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
 
         if (key == getString(R.string.device_location_key)) {
-            sharedPreferenceUtil?.saveIsLocationNeedUpdate(true)
+            sharedPreferenceUtil.saveIsLocationNeedUpdate(true)
         }
         if (key == getString(R.string.attachment_language_key)) {
             val intent = Intent(context, MainActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
         }
         val preference: Preference? = key?.let { findPreference(it) }
         preference?.let {
             if (preference is ListPreference)
-                sharedPreferenceUtil?.saveIsDataNeedUpdate(true)
+                sharedPreferenceUtil.saveIsDataNeedUpdate(true)
         }
     }
 

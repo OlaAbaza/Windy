@@ -1,42 +1,22 @@
 package com.example.windy.ui.viewModel
 
-import androidx.lifecycle.*
-import com.example.windy.database.WeatherDatabase
-import com.example.windy.domain.WeatherConditions
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.windy.repository.WeatherRepository
+import com.example.windy.util.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SettingViewModel(
-    private val weatherDatabase: WeatherDatabase
+@HiltViewModel
+class SettingViewModel @Inject constructor(
+    private val repository: WeatherRepository
 ) : ViewModel() {
-    private val _getSelectedTimeZone = MutableLiveData<String?>()
+    private val _getSelectedTimeZone = MutableSharedFlow<Resource>()
 
-    val getSelectedTimeZone: LiveData<String?>
-        get() = _getSelectedTimeZone
-
-    //
-//    fun notifyUser(timeZone: WeatherConditions) {
-//        lateinit var apiObj: WeatherConditions
-//        val jop = CoroutineScope(Dispatchers.IO).launch {
-//            apiObj = localDataSource.getApiObj(timeZone)
-//        }
-//        jop.invokeOnCompletion {
-//            val notificationUtils = WeatherNotification(getApplication())
-//            val nb: NotificationCompat.Builder =
-//                notificationUtils.getAndroidChannelNotification(
-//                    "" + apiObj.currentWether.temp.toInt()
-//                        .toString() + "°" +" "+ apiObj.timezone,
-//                    "" + apiObj.currentWether.weather.get(0).description,
-//                    true,
-//                    true
-//                )
-//            notificationUtils.getManager()?.notify(4, nb.build())
-//
-//        }
-//    }
-    private val repository by lazy {
-        WeatherRepository(weatherDatabase)
-    }
+    val getSelectedTimeZone = _getSelectedTimeZone.asSharedFlow()
 
     fun getWeatherData(
         lat: Float,
@@ -44,23 +24,12 @@ class SettingViewModel(
         lang: String,
         unit: String
     ) {
-        var weatherConditions: WeatherConditions? = null
-        val job = viewModelScope.launch {
-            weatherConditions = repository.fetchWeatherData(lat.toDouble(), lon.toDouble(), lang, unit)
-        }
-        job.invokeOnCompletion {
-            _getSelectedTimeZone.value = weatherConditions?.timezone
+        viewModelScope.launch {
+            _getSelectedTimeZone.emit(
+                repository.fetchWeatherData(lat.toDouble(), lon.toDouble(), lang, unit)
+            )
         }
     }
 
-    class Factory(private val weatherDatabase: WeatherDatabase) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(SettingViewModel::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                return SettingViewModel(weatherDatabase) as T
-            }
-            throw IllegalArgumentException("Unable to construct viewModel")
-        }
-    }
 }
 

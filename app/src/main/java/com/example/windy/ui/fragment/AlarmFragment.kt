@@ -13,29 +13,31 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.RecyclerView
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.example.windy.R
-import com.example.windy.adapter.AlarmListAdapter
-import com.example.windy.database.Alarm
-import com.example.windy.database.WeatherDatabase
 import com.example.windy.databinding.AlarmDialogBinding
 import com.example.windy.databinding.AlarmFragmentBinding
+import com.example.windy.extensions.action
+import com.example.windy.extensions.showSnackbar
+import com.example.windy.extensions.toast
+import com.example.windy.models.Alarm
 import com.example.windy.receiver.AlarmReceiver
+import com.example.windy.ui.adapter.AlarmListAdapter
+import com.example.windy.ui.viewModel.AlarmViewModel
 import com.example.windy.util.Constant.ALARM_END_TIME
 import com.example.windy.util.Constant.ALARM_ID
 import com.example.windy.util.Constant.EVENT
 import com.example.windy.util.Constant.SOUND
 import com.example.windy.util.cancelAlarm
-import com.example.windy.ui.viewModel.AlarmViewModel
-import com.google.android.material.snackbar.BaseTransientBottomBar
-import com.google.android.material.snackbar.Snackbar
+import com.example.windy.util.swipeToDeleteFunction
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import java.text.SimpleDateFormat
 import java.util.*
 
+@AndroidEntryPoint
 class AlarmFragment : Fragment() {
 
     private lateinit var binding: AlarmFragmentBinding
@@ -45,39 +47,20 @@ class AlarmFragment : Fragment() {
     private var alarmEndTime = Calendar.getInstance()
     private var alarmDate = Calendar.getInstance()
     private var alarmId: Int? = null
-    private val viewModel by lazy {
-        val application = requireNotNull(activity).application
-        val weatherDatabase = WeatherDatabase.getInstance(application)
-        ViewModelProvider(this, AlarmViewModel.Factory(weatherDatabase)).get(
-            AlarmViewModel::class.java
-        )
-    }
+    private val viewModel: AlarmViewModel by viewModels()
+
     private val isAlarmTimeValid by lazy {
         alarmStartTime.timeInMillis < alarmEndTime.timeInMillis
-                && alarmDate.timeInMillis > Calendar.getInstance().timeInMillis
+        //&& alarmDate.timeInMillis >= Calendar.getInstance().timeInMillis
     }
+
     private val itemTouchHelper by lazy {
-        val itemTouchHelperCallback =
-            object :
-                ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
-                override fun onMove(
-                    recyclerView: RecyclerView,
-                    viewHolder: RecyclerView.ViewHolder,
-                    target: RecyclerView.ViewHolder
-                ): Boolean {
-                    return false
-                }
-
-                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                    val position = viewHolder.adapterPosition
-                    val item = alarmListAdapter.currentList[position]
-                    viewModel.deleteAlarmItem(item.id)
-                    showSnackBar(item, position)
-
-                }
-
-            }
-        ItemTouchHelper(itemTouchHelperCallback)
+        swipeToDeleteFunction({ position ->
+            val item = alarmListAdapter.currentList[position]
+            viewModel.deleteAlarmItem(item.id)
+            showSnackBar(item, position)
+        }
+        )
     }
 
     override fun onCreateView(
@@ -85,12 +68,6 @@ class AlarmFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = AlarmFragmentBinding.inflate(inflater, container, false)
-
-        return binding.root
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
 
         alarmListAdapter = AlarmListAdapter(AlarmListAdapter.AlarmListener { alarmItem ->
             viewModel.updateAlarmDetails(alarmItem)
@@ -104,25 +81,31 @@ class AlarmFragment : Fragment() {
                 showAlarmDialog(null)
             }
         }
+        lifecycleScope.launchWhenStarted {
+            viewModel.getAlarmItem.collectLatest { alarm ->
+                context?.let { _ ->
+                    setAlarm(
+                        alarm.id,
+                        alarmStartTime,
+                        alarmEndTime,
+                        alarm.event,
+                        alarm.sound
+                    )
+                }
+            }
+        }
+        lifecycleScope.launchWhenStarted {
+            viewModel.navigateToSelectedProperty.collectLatest { alarmItem ->
+                alarmItem?.let {
+                    alarmId = alarmItem.id
+                    showAlarmDialog(alarmItem)
+                }
+            }
 
-        viewModel.navigateToSelectedProperty.observe(viewLifecycleOwner, { alarmItem ->
-            alarmItem?.let {
-                alarmId = alarmItem.id
-                showAlarmDialog(alarmItem)
-            }
-        })
-        viewModel.getAlarmItem.observe(viewLifecycleOwner, { alarm ->
-            context?.let { _ ->
-                setAlarm(
-                    alarm.id,
-                    alarmStartTime,
-                    alarmEndTime,
-                    alarm.event,
-                    alarm.sound
-                )
-            }
-        })
+        }
+        return binding.root
     }
+
 
     private fun showAlarmDialog(alarm: Alarm?) {
         val dialog = context?.let { Dialog(it) }
@@ -151,11 +134,7 @@ class AlarmFragment : Fragment() {
                     insertAlarmItem()
                     dialog?.dismiss()
                 } else {
-                    Toast.makeText(
-                        context,
-                        getString(R.string.validate_time_msg),
-                        Toast.LENGTH_LONG
-                    ).show()
+                    context?.toast(getString(R.string.validate_time_msg))
                 }
             }
         }
@@ -165,6 +144,8 @@ class AlarmFragment : Fragment() {
     }
 
     private fun setAlarmDate() {
+        alarmStartTime.set(Calendar.YEAR, alarmDate.get(Calendar.YEAR))
+
         alarmStartTime.set(Calendar.YEAR, alarmDate.get(Calendar.YEAR))
         alarmStartTime.set(Calendar.MONTH, alarmDate.get(Calendar.MONTH))
         alarmStartTime.set(Calendar.DAY_OF_MONTH, alarmDate.get(Calendar.DAY_OF_MONTH))
@@ -193,34 +174,12 @@ class AlarmFragment : Fragment() {
     }
 
     private fun showSnackBar(alarm: Alarm, position: Int) {
-        Snackbar.make(
-            binding.alarmLayout,
-            getString(R.string.deleted),
-            Snackbar.LENGTH_LONG
-        ).apply {
-            setAction(getString(R.string.undo)) {
+        binding.alarmLayout.showSnackbar(R.string.deleted) {
+            action(R.string.undo, {
                 viewModel.insertAlarmItem(alarm)
                 binding.rvAlarms.scrollToPosition(position)
-            }
-            addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
-                override fun onShown(transientBottomBar: Snackbar?) {
-                    super.onShown(transientBottomBar)
-                }
-
-                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                    super.onDismissed(transientBottomBar, event)
-                    if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
-                        cancelAlarm(alarm.id, context)
-                    }
-
-                }
-            })
-
-            setTextColor(Color.parseColor(R.color.white.toString()))
-            setActionTextColor(Color.parseColor(R.color.purple_200.toString()))
-            setBackgroundTint(Color.parseColor(R.color.gray.toString()))
-            duration.minus(1)
-        }.show()
+            }, { cancelAlarm(alarm.id, context) })
+        }
     }
 
 
@@ -323,16 +282,10 @@ class AlarmFragment : Fragment() {
     private fun validateDialogFields(): Boolean {
         when {
             bindingDialog.toTime.text.isEmpty() ||
-                    bindingDialog.fromTime.text.isEmpty() -> Toast.makeText(
-                context,
-                getString(R.string.empty_time),
-                Toast.LENGTH_SHORT
-            ).show()
-            bindingDialog.calenderBtn.text.isEmpty() -> Toast.makeText(
-                context,
-                getString(R.string.empty_date),
-                Toast.LENGTH_SHORT
-            ).show()
+                    bindingDialog.fromTime.text.isEmpty() -> context?.toast(getString(R.string.empty_time))
+
+            bindingDialog.calenderBtn.text.isEmpty() -> context?.toast(getString(R.string.empty_date))
+
             else -> return true
         }
         return false

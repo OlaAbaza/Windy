@@ -1,29 +1,31 @@
 package com.example.windy.ui.viewModel
 
-import androidx.lifecycle.*
-import com.example.windy.database.Alarm
-import com.example.windy.database.WeatherDatabase
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
+import com.example.windy.models.Alarm
 import com.example.windy.repository.WeatherRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AlarmViewModel(private val weatherDatabase: WeatherDatabase) : ViewModel() {
+@HiltViewModel
+class AlarmViewModel @Inject constructor(
+    private val repository: WeatherRepository,
+) : ViewModel() {
 
-    private val _navigateToSelectedProperty = MutableLiveData<Alarm?>()
+    private val _navigateToSelectedProperty = MutableSharedFlow<Alarm?>()
 
-    val navigateToSelectedProperty: LiveData<Alarm?>
-        get() = _navigateToSelectedProperty
+    val navigateToSelectedProperty = _navigateToSelectedProperty.asSharedFlow()
 
-    private val _getAlarmItem = MutableLiveData<Alarm>()
+    private val _getAlarmItem = MutableSharedFlow<Alarm>()
 
-    val getAlarmItem: LiveData<Alarm>
-        get() = _getAlarmItem
-
-    private val repository by lazy {
-        WeatherRepository(weatherDatabase)
-    }
+    val getAlarmItem = _getAlarmItem.asSharedFlow()
 
     val alarmList by lazy {
-        repository.alarmList
+        repository.alarmList.asLiveData()
     }
 
 
@@ -34,27 +36,15 @@ class AlarmViewModel(private val weatherDatabase: WeatherDatabase) : ViewModel()
     }
 
     fun insertAlarmItem(item: Alarm) {
-        var id = 0L
         viewModelScope.launch {
-            id = repository.insertAlarm(item)
-        }.invokeOnCompletion {
-            item.id = id.toInt()
-            _getAlarmItem.value = item
+            item.id = repository.insertAlarm(item).toInt()
+            _getAlarmItem.emit(item)
         }
-
     }
 
     fun updateAlarmDetails(alarm: Alarm) {
-        _navigateToSelectedProperty.value = alarm
-    }
-
-    class Factory(private val weatherDatabase: WeatherDatabase) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(AlarmViewModel::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                return AlarmViewModel(weatherDatabase) as T
-            }
-            throw IllegalArgumentException("Unable to construct viewModel")
+        viewModelScope.launch {
+            _navigateToSelectedProperty.emit(alarm)
         }
     }
 }

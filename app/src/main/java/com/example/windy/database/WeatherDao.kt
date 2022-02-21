@@ -1,13 +1,15 @@
 package com.example.windy.database
 
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.example.windy.models.DatabaseWeatherConditions
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface WeatherDao {
+    //Queries with a Flow return type always run on the Room executors, so they are always main-safe.
     @Query("SELECT * FROM WeatherConditions")
-    fun getWeatherConditions(): LiveData<List<DatabaseWeatherConditions>>
+    fun getWeatherConditions(): Flow<List<DatabaseWeatherConditions>>
 
     @Query("SELECT * FROM WeatherConditions")
     suspend fun getAllWeatherConditions(): List<DatabaseWeatherConditions>

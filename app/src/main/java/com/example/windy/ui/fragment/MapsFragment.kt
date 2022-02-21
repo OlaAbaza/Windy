@@ -5,11 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.windy.R
 import com.example.windy.databinding.FragmentMapsBinding
+import com.example.windy.extensions.makeGone
+import com.example.windy.extensions.makeVisible
+import com.example.windy.extensions.toast
 import com.example.windy.util.Constant
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -67,8 +69,7 @@ class MapsFragment : Fragment() {
         handleViewsVisibility()
         binding.confirmBtn.setOnClickListener {
             if (latitude == 0.0) {
-                Toast.makeText(context, getString(R.string.choose_place_msg), Toast.LENGTH_SHORT)
-                    .show()
+                context?.toast(getString(R.string.choose_place_msg))
             } else {
                 if (parentScreenName == Constant.FAVORITE) {
                     this.findNavController().navigate(
@@ -113,11 +114,11 @@ class MapsFragment : Fragment() {
 
     private fun handleViewsVisibility() {
         if (parentScreenName == Constant.HOME) {
-            binding.confirmBtn.visibility = View.GONE
-            binding.tileTypeSpinner.visibility = View.VISIBLE
+            binding.confirmBtn.makeGone()
+            binding.tileTypeSpinner.makeVisible()
         } else {
-            binding.confirmBtn.visibility = View.VISIBLE
-            binding.tileTypeSpinner.visibility = View.GONE
+            binding.confirmBtn.makeVisible()
+            binding.tileTypeSpinner.makeGone()
         }
     }
 

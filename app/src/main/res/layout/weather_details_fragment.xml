@@ -8,7 +8,7 @@
 
         <variable
             name="weatherConditionItem"
-            type="com.example.windy.domain.WeatherConditions" />
+            type="com.example.windy.models.domain.WeatherConditions" />
 
         <variable
             name="weatherDetailsViewModel"

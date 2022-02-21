@@ -1,23 +1,23 @@
 package com.example.windy.ui.viewModel
 
-import androidx.lifecycle.*
-import com.example.windy.database.WeatherDatabase
-import com.example.windy.domain.WeatherConditions
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.windy.repository.WeatherRepository
+import com.example.windy.util.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class WeatherDetailsViewModel(
-    private val weatherDatabase: WeatherDatabase,
+@HiltViewModel
+class WeatherDetailsViewModel @Inject constructor(
+    private val repository: WeatherRepository,
 ) : ViewModel() {
 
-    private val _getDefaultWeatherCondition = MutableLiveData<WeatherConditions?>()
+    private val _getDefaultWeatherCondition: MutableStateFlow<Resource> =
+        MutableStateFlow(Resource.Loading)
 
-    val getDefaultWeatherCondition: LiveData<WeatherConditions?>
-        get() = _getDefaultWeatherCondition
-
-    private val repository by lazy {
-        WeatherRepository(weatherDatabase)
-    }
+    val getDefaultWeatherCondition = _getDefaultWeatherCondition
 
     fun getWeatherData(
         lat: Double,
@@ -25,12 +25,8 @@ class WeatherDetailsViewModel(
         lang: String,
         unit: String
     ) {
-        var weatherConditions: WeatherConditions? = null
-        val job = viewModelScope.launch {
-            weatherConditions = repository.fetchWeatherData(lat, lon, lang, unit)
-        }
-        job.invokeOnCompletion {
-            _getDefaultWeatherCondition.value = weatherConditions
+        viewModelScope.launch {
+            _getDefaultWeatherCondition.value = repository.fetchWeatherData(lat, lon, lang, unit)
         }
     }
 
@@ -44,24 +40,11 @@ class WeatherDetailsViewModel(
     }
 
     fun getObjByTimezone(timeZone: String) {
-        var weatherConditions: WeatherConditions? = null
 
-        val job = viewModelScope.launch {
-            weatherConditions = repository.getObjByTimezone(timeZone)
+        viewModelScope.launch {
+            _getDefaultWeatherCondition.value = repository.getObjByTimezone(timeZone)
         }
-        job.invokeOnCompletion {
-            _getDefaultWeatherCondition.value = weatherConditions
-        }
+
     }
 
-
-    class Factory(private val weatherDatabase: WeatherDatabase) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(WeatherDetailsViewModel::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                return WeatherDetailsViewModel(weatherDatabase) as T
-            }
-            throw IllegalArgumentException("Unable to construct viewModel")
-        }
-    }
 }

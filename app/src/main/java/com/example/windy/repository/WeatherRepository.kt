@@ -1,19 +1,22 @@
 package com.example.windy.repository
 
-import androidx.lifecycle.Transformations
-import com.example.windy.database.Alarm
 import com.example.windy.database.WeatherDatabase
-import com.example.windy.database.asDomainModel
-import com.example.windy.domain.WeatherConditions
-import com.example.windy.network.WeatherApi
-import com.example.windy.network.asDatabaseModel
+import com.example.windy.models.Alarm
+import com.example.windy.models.asDatabaseModel
+import com.example.windy.models.asDomainModel
+import com.example.windy.network.WeatherApiService
+import com.example.windy.util.Resource
+import kotlinx.coroutines.flow.map
 import timber.log.Timber
+import javax.inject.Inject
 
-
-class WeatherRepository(private val weatherDatabase: WeatherDatabase) {
+class WeatherRepository @Inject constructor(
+    private val weatherDatabase: WeatherDatabase,
+    private val weatherApiService: WeatherApiService
+) {
 
     val weatherConditions by lazy {
-        Transformations.map(weatherDatabase.weatherDao().getWeatherConditions()) {
+        weatherDatabase.weatherDao().getWeatherConditions().map {
             it.asDomainModel()
         }
     }
@@ -27,40 +30,36 @@ class WeatherRepository(private val weatherDatabase: WeatherDatabase) {
         lon: Double,
         lang: String,
         unit: String
-    ): WeatherConditions? {
-        try {
-            val result = WeatherApi.retrofitService.getCurrentWeatherByLatLng(
+    ): Resource {
+        return try {
+            val result = weatherApiService.getCurrentWeatherByLatLng(
                 lat,
                 lon,
                 lang,
                 unit
-            )
+            ).asDatabaseModel()
+            weatherDatabase.weatherDao().insert(result)
 
-            weatherDatabase.weatherDao().insert(result.asDatabaseModel())
-
-            return result.asDatabaseModel().asDomainModel()
+            Resource.Success(result.asDomainModel())
 
         } catch (cause: Throwable) {
-            Timber.i("failed %s", cause.message)
-            //throw TitleRefreshError("Unable to refresh title", cause)
+            cause.printStackTrace()
+            Resource.Error(cause.message.toString())
         }
-        return null
     }
 
     suspend fun updateAllWeatherData(lang: String, unit: String) {
         val items = weatherDatabase.weatherDao().getAllWeatherConditions()
         for (item in items) {
             try {
-                val result = WeatherApi.retrofitService.getCurrentWeatherByLatLng(
+                fetchWeatherData(
                     item.lat,
                     item.lon,
                     lang,
                     unit
                 )
-                weatherDatabase.weatherDao().insert(result.asDatabaseModel())
             } catch (cause: Throwable) {
                 Timber.i("failed %s", cause.message)
-                //throw TitleRefreshError("Unable to refresh title", cause)
             }
         }
     }
@@ -77,7 +76,10 @@ class WeatherRepository(private val weatherDatabase: WeatherDatabase) {
         return weatherDatabase.alarmDao().insertAlarm(alarmObj)
     }
 
-    suspend fun getObjByTimezone(timeZone: String): WeatherConditions {
-        return (weatherDatabase.weatherDao().getObjByTimezone(timeZone)).asDomainModel()
+    suspend fun getObjByTimezone(timeZone: String): Resource.Success {
+        return Resource.Success(
+            weatherDatabase.weatherDao().getObjByTimezone(timeZone)
+                .asDomainModel()
+        )
     }
 }

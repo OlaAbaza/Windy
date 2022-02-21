@@ -1,4 +1,4 @@
-package com.example.windy.domain
+package com.example.windy.models.domain
 
 import com.example.windy.util.dateFormat
 import com.example.windy.util.timeFormat
@@ -20,7 +20,12 @@ data class Alert(
     val senderName: String?,
     val start: Int?,
     val tags: List<String>?
-)
+) {
+    val startTime: String?
+        get() = start?.let { timeFormat(it) }
+    val endTime: String?
+        get() = end?.let { timeFormat(it) }
+}
 
 data class Current(
     val clouds: Int?,

@@ -1,90 +1,63 @@
 package com.example.windy.ui.fragment
 
-import android.app.AlertDialog
 import android.app.Dialog
-import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.RecyclerView
 import com.example.windy.R
-import com.example.windy.adapter.DailyListAdapter
-import com.example.windy.adapter.FavoriteListAdapter
-import com.example.windy.adapter.HourlyListAdapter
-import com.example.windy.database.WeatherDatabase
 import com.example.windy.databinding.FavDialogBinding
 import com.example.windy.databinding.FavoriteFragmentBinding
-import com.example.windy.domain.WeatherConditions
+import com.example.windy.extensions.action
+import com.example.windy.extensions.showCheckNetworkDialog
+import com.example.windy.extensions.showSnackbar
+import com.example.windy.extensions.toast
+import com.example.windy.models.domain.WeatherConditions
 import com.example.windy.network.WeatherApiFilter
+import com.example.windy.ui.adapter.DailyListAdapter
+import com.example.windy.ui.adapter.FavoriteListAdapter
+import com.example.windy.ui.adapter.HourlyListAdapter
+import com.example.windy.ui.viewModel.FavoriteViewModel
 import com.example.windy.util.Constant
 import com.example.windy.util.SharedPreferenceUtil
 import com.example.windy.util.isConnected
-import com.example.windy.ui.viewModel.FavoriteViewModel
-import com.google.android.material.snackbar.Snackbar
+import com.example.windy.util.swipeToDeleteFunction
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class FavoriteFragment : Fragment() {
 
+    @Inject
+    lateinit var sharedPreferenceUtil: SharedPreferenceUtil
+
     private lateinit var favoriteAdapter: FavoriteListAdapter
+
     private lateinit var binding: FavoriteFragmentBinding
-    private val viewModel by lazy {
-        val application = requireNotNull(activity).application
-        val weatherDatabase = WeatherDatabase.getInstance(application)
-        ViewModelProvider(this, FavoriteViewModel.Factory(weatherDatabase)).get(
-            FavoriteViewModel::class.java
-        )
-    }
-    private val sharedPreferenceUtil by lazy {
-        context?.run { SharedPreferenceUtil(this) }
-    }
+
+    private val viewModel: FavoriteViewModel by viewModels()
     private val itemTouchHelper by lazy {
-        val itemTouchHelperCallback =
-            object :
-                ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
-                override fun onMove(
-                    recyclerView: RecyclerView,
-                    viewHolder: RecyclerView.ViewHolder,
-                    target: RecyclerView.ViewHolder
-                ): Boolean {
-                    return false
-                }
+        swipeToDeleteFunction({ position ->
+            val item = favoriteAdapter.currentList[position]
+            viewModel.deleteWeatherItem(item.timezone)
+            showSnackBar(item, position)
 
-                override fun getSwipeDirs(
-                    recyclerView: RecyclerView,
-                    viewHolder: RecyclerView.ViewHolder
-                ): Int {
-                    val position = viewHolder.adapterPosition
-                    val item = favoriteAdapter.currentList[position]
-                    if (isDefaultWeather(item.timezone)) {
-                        Toast.makeText(
-                            context,
-                            getString(R.string.delete_default_msg),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        return 0
-                    }
-                    return super.getSwipeDirs(recyclerView, viewHolder)
-                }
+        }, { position ->
+            val item = favoriteAdapter.currentList[position]
 
-                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                    val position = viewHolder.adapterPosition
-                    val item = favoriteAdapter.currentList[position]
-                    viewModel.deleteWeatherItem(item.timezone)
-                    showSnackBar(item, position)
-
-                }
-
+            if (isDefaultWeather(item.timezone)) {
+                context?.toast(getString(R.string.delete_default_msg))
             }
-        ItemTouchHelper(itemTouchHelperCallback)
+            isDefaultWeather(item.timezone)
+        })
     }
 
     override fun onCreateView(
@@ -99,9 +72,9 @@ class FavoriteFragment : Fragment() {
                 viewModel.getWeatherData(
                     arguments.lat,
                     arguments.lon,
-                    sharedPreferenceUtil?.getLanguage()
+                    sharedPreferenceUtil.getLanguage()
                         ?: WeatherApiFilter.ENGLISH.value,
-                    sharedPreferenceUtil?.getTempUnit()
+                    sharedPreferenceUtil.getTempUnit()
                         ?: WeatherApiFilter.IMPERIAL.value
                 )
             }
@@ -122,14 +95,14 @@ class FavoriteFragment : Fragment() {
                 }
             }
         }
-
-        viewModel.navigateToSelectedProperty.observe(viewLifecycleOwner, {
-            it?.let {
-                showWeatherDetailsDialog(it)
-                viewModel.doneNavigating()
+        lifecycleScope.launchWhenStarted {
+            viewModel.navigateToSelectedProperty.collectLatest {
+                it?.let {
+                    showWeatherDetailsDialog(it)
+                    viewModel.doneNavigating()
+                }
             }
-        })
-
+        }
         return binding.root
     }
 
@@ -161,33 +134,25 @@ class FavoriteFragment : Fragment() {
     }
 
     private fun showSnackBar(weatherConditions: WeatherConditions, position: Int) {
-        Snackbar.make(
-            binding.favLayout,
-            getString(R.string.deleted),
-            Snackbar.LENGTH_LONG
-        ).apply {
-            setAction(getString(R.string.undo)) {
+        binding.favLayout.showSnackbar(R.string.deleted) {
+            action(R.string.undo, {
                 viewModel.getWeatherData(
                     (weatherConditions.lat).toFloat(),
                     (weatherConditions.lon).toFloat(),
-                    sharedPreferenceUtil?.getLanguage()
+                    sharedPreferenceUtil.getLanguage()
                         ?: WeatherApiFilter.ENGLISH.value,
-                    sharedPreferenceUtil?.getTempUnit()
+                    sharedPreferenceUtil.getTempUnit()
                         ?: WeatherApiFilter.IMPERIAL.value
                 )
                 binding.rvFavList.scrollToPosition(position)
-            }
-            setTextColor(Color.parseColor(R.color.white.toString()))
-            setActionTextColor(Color.parseColor(R.color.purple_200.toString()))
-            setBackgroundTint(Color.parseColor(R.color.gray.toString()))
-            duration.minus(1)
-        }.show()
+            })
+        }
     }
 
     private fun navigateToMapScreen() {
         this.findNavController()
             .navigate(
-               FavoriteFragmentDirections.actionFavoriteFragmentToMapsFragment(
+                FavoriteFragmentDirections.actionFavoriteFragmentToMapsFragment(
                     Constant.FAVORITE
                 )
             )
@@ -197,25 +162,9 @@ class FavoriteFragment : Fragment() {
         if (context?.let { isConnected(it) } == true)
             onSuccess.invoke()
         else
-            showCheckNetworkDialog()
+            requireActivity().showCheckNetworkDialog()
     }
 
-    private fun isDefaultWeather(timeZone: String) = sharedPreferenceUtil?.getTimeZone() == timeZone
+    private fun isDefaultWeather(timeZone: String) = sharedPreferenceUtil.getTimeZone() == timeZone
 
-
-    private fun showCheckNetworkDialog() {
-        val builder = AlertDialog.Builder(requireActivity())
-        builder.setMessage(getString(R.string.check_internet))
-            .setCancelable(false)
-            .setPositiveButton(getString(R.string.connect)) { dialog, _ ->
-                startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
-
-                dialog.dismiss()
-            }
-            .setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
-                requireActivity().finish()
-                dialog.dismiss()
-            }
-            .show()
-    }
 }

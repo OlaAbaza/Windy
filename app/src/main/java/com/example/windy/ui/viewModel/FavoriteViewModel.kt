@@ -1,26 +1,28 @@
 package com.example.windy.ui.viewModel
 
-import androidx.lifecycle.*
-import com.example.windy.database.WeatherDatabase
-import com.example.windy.domain.WeatherConditions
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
+import com.example.windy.models.domain.WeatherConditions
 import com.example.windy.repository.WeatherRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class FavoriteViewModel(
-    private val weatherDatabase: WeatherDatabase
+@HiltViewModel
+class FavoriteViewModel @Inject constructor(
+    private val repository: WeatherRepository,
 ) : ViewModel() {
 
-    private val _navigateToSelectedProperty = MutableLiveData<WeatherConditions?>()
+    private val _navigateToSelectedProperty = MutableSharedFlow<WeatherConditions?>()
 
-    val navigateToSelectedProperty: LiveData<WeatherConditions?>
-        get() = _navigateToSelectedProperty
+    val navigateToSelectedProperty = _navigateToSelectedProperty.asSharedFlow()
 
-    private val repository by lazy {
-        WeatherRepository(weatherDatabase)
-    }
 
     val weatherConditionsList by lazy {
-        repository.weatherConditions
+        repository.weatherConditions.asLiveData()
     }
 
     fun getWeatherData(
@@ -41,20 +43,15 @@ class FavoriteViewModel(
     }
 
     fun displayWeatherDetails(weatherConditions: WeatherConditions) {
-        _navigateToSelectedProperty.value = weatherConditions
+        viewModelScope.launch {
+            _navigateToSelectedProperty.emit(weatherConditions)
+        }
     }
 
     fun doneNavigating() {
-        _navigateToSelectedProperty.value = null
-    }
-
-    class Factory(private val weatherDatabase: WeatherDatabase) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(FavoriteViewModel::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                return FavoriteViewModel(weatherDatabase) as T
-            }
-            throw IllegalArgumentException("Unable to construct viewModel")
+        viewModelScope.launch {
+            _navigateToSelectedProperty.emit(null)
         }
     }
+
 }

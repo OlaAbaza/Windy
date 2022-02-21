@@ -7,6 +7,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.example.windy.receiver.AlarmReceiver
 import java.text.SimpleDateFormat
 import java.util.*
@@ -58,6 +60,42 @@ fun cancelAlarm(alarmId: Int, context: Context) {
     val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     alarmManager.cancel(pendingIntent)
 }
+
+fun swipeToDeleteFunction(
+    onSwipe: (position: Int) -> Unit,
+    getSwipeDirs: ((position: Int) -> Boolean?)? = null
+): ItemTouchHelper {
+    val itemTouchHelperCallback =
+        object :
+            ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun getSwipeDirs(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ): Int {
+                getSwipeDirs?.let {
+                    if (getSwipeDirs(viewHolder.adapterPosition) == true) {
+                        return 0
+                    }
+                }
+                return super.getSwipeDirs(recyclerView, viewHolder)
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                onSwipe(viewHolder.adapterPosition)
+            }
+
+        }
+    return ItemTouchHelper(itemTouchHelperCallback)
+}
+
 
 fun getImgUrl(iconName: String): String =
     "https://openweathermap.org/img/wn/$iconName@2x.png"
