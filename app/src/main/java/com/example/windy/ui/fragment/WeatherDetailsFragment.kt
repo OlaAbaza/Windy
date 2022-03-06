@@ -17,13 +17,10 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.windy.R.*
 import com.example.windy.databinding.WeatherDetailsLayoutBinding
-import com.example.windy.extensions.makeGone
-import com.example.windy.extensions.makeVisible
-import com.example.windy.extensions.showCheckNetworkDialog
+import com.example.windy.extensions.*
 import com.example.windy.models.domain.Alert
 import com.example.windy.models.domain.CurrentLocation
 import com.example.windy.network.WeatherApiFilter
@@ -33,7 +30,6 @@ import com.example.windy.ui.viewModel.WeatherDetailsViewModel
 import com.example.windy.util.*
 import com.google.android.gms.location.*
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
 import java.util.*
 import javax.inject.Inject
 
@@ -120,8 +116,8 @@ class WeatherDetailsFragment : Fragment() {
 
     private fun stopLoading() {
         binding.apply {
-            loadingLayout.visibility = View.GONE
-            weatherDetailsLayout.root.visibility = View.VISIBLE
+            loadingLayout.makeGone()
+            weatherDetailsLayout.root.makeVisible()
         }
 
     }
@@ -190,38 +186,33 @@ class WeatherDetailsFragment : Fragment() {
                 getCurrentLocation.value = null
             }
         })
-        lifecycleScope.launchWhenStarted {
-            viewModel.getDefaultWeatherCondition.collectLatest { response ->
-                when (response) {
-                    is Resource.Success -> {
-                        stopLoading()
+        collectLatestLifeCycleFlow(viewModel.getDefaultWeatherCondition) { response ->
+            when (response) {
+                is Resource.Success -> {
+                    stopLoading()
 
-                        response.data.apply item@{
-                            sharedPreferenceUtil.saveTimeZone(timezone)
-                            binding.weatherDetailsLayout.apply {
-                                weatherConditionItem = this@item
-                                layoutWeatherDetailsContent.weatherConditionItem = this@item
-                                swipeRefreshLayout.isRefreshing = false
-                                if (!(alerts.isNullOrEmpty()))
-                                    notifyUser(alerts)
-                            }
+                    response.data.apply item@{
+                        sharedPreferenceUtil.saveTimeZone(timezone)
+                        binding.weatherDetailsLayout.apply {
+                            weatherConditionItem = this@item
+                            layoutWeatherDetailsContent.weatherConditionItem = this@item
+                            swipeRefreshLayout.isRefreshing = false
+                            if (!(alerts.isNullOrEmpty()))
+                                notifyUser(alerts)
                         }
                     }
-                    is Resource.Loading -> {
-                        startLoading()
-                    }
-                    is Resource.Error -> {
-                        stopLoading()
-//                        response.message.let { message ->
-//                            binding.progressBar.hide()
-//                            context?.toast(message.toString())
-//                        }
-                    }
                 }
-
-
+                is Resource.Loading -> {
+                    startLoading()
+                }
+                is Resource.Error -> {
+                    stopLoading()
+                    context?.toast(response.msg)
+                }
             }
+
         }
+
     }
 
     private fun notifyUser(alert: List<Alert>) {
@@ -245,7 +236,7 @@ class WeatherDetailsFragment : Fragment() {
         }
     }
 
-    ////////////////////////current location///////////////////////////////
+    //////////////////////////////current location///////////////////////////////
     @SuppressLint("MissingPermission")
     private fun getLastLocation() {
         if (checkPermissions()) {

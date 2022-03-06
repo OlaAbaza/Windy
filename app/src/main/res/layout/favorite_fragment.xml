@@ -28,7 +28,7 @@
             android:text="@string/manage_cities"
             android:textAlignment="center"
             android:textColor="@color/white"
-            android:textSize="@dimen/Headline"
+            android:textSize="@dimen/dimen_35"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/relativeLayout"
             app:layout_constraintEnd_toEndOf="parent"

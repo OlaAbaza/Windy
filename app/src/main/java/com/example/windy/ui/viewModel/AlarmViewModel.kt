@@ -25,7 +25,7 @@ class AlarmViewModel @Inject constructor(
     val getAlarmItem = _getAlarmItem.asSharedFlow()
 
     val alarmList by lazy {
-        repository.alarmList.asLiveData()
+        repository.getAlarmList().asLiveData()
     }
 
 

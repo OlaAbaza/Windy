@@ -5,12 +5,12 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.example.windy.R
+import com.example.windy.extensions.collectLatestLifeCycleFlow
 import com.example.windy.network.WeatherApiFilter
 import com.example.windy.ui.MainActivity
 import com.example.windy.ui.viewModel.SettingViewModel
@@ -19,7 +19,6 @@ import com.example.windy.util.Resource
 import com.example.windy.util.SharedPreferenceUtil
 import com.example.windy.util.isConnected
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -38,8 +37,8 @@ class SettingsFragment : PreferenceFragmentCompat(),
         if (arguments.lat != 0f) {
             if (context?.let { context -> isConnected(context) } == true) {
                 viewModel.getWeatherData(
-                    arguments.lat,
-                    arguments.lon,
+                    arguments.lat.toDouble(),
+                    arguments.lon.toDouble(),
                     sharedPreferenceUtil.getLanguage()
                         ?: WeatherApiFilter.ENGLISH.value,
                     sharedPreferenceUtil.getTempUnit()
@@ -61,19 +60,16 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        lifecycleScope.launchWhenStarted {
-            viewModel.getSelectedTimeZone.collectLatest { response ->
-                when (response) {
-                    is Resource.Success -> {
-                        response.data.apply {
-                            sharedPreferenceUtil.saveTimeZone(this.timezone)
-                            sharedPreferenceUtil.saveIsLocationNeedUpdate(true)
-                        }
-
+        collectLatestLifeCycleFlow(viewModel.getSelectedTimeZone) { response ->
+            when (response) {
+                is Resource.Success -> {
+                    response.data.apply {
+                        sharedPreferenceUtil.saveTimeZone(this.timezone)
+                        sharedPreferenceUtil.saveIsLocationNeedUpdate(true)
                     }
-                    else -> {}
                 }
-
+                else -> {
+                }
             }
         }
     }

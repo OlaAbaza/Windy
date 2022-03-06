@@ -23,6 +23,9 @@ buildscript {
         version_work = "1.0.1"
         version_timber = "4.7.1"
         hilt_version = '2.40'
+        work_version = "2.5.0"
+        fragment_version = "1.4.1"
+
     }
     repositories {
         google()

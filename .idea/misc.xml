@@ -3,11 +3,12 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Ola Abaza/AndroidStudioProjects/Windy/app/src/debug/res/layout/activity_main.xml" value="0.1" />
         <entry key="..\:/Users/Ola Abaza/AndroidStudioProjects/Windy/app/src/main/res/drawable/arrow_drop_down.xml" value="0.1527777777777778" />
         <entry key="..\:/Users/Ola Abaza/AndroidStudioProjects/Windy/app/src/main/res/drawable/cardview_bg.xml" value="0.1" />
         <entry key="..\:/Users/Ola Abaza/AndroidStudioProjects/Windy/app/src/main/res/drawable/ic_launcher_background.xml" value="0.14537037037037037" />
         <entry key="..\:/Users/Ola Abaza/AndroidStudioProjects/Windy/app/src/main/res/layout/activity_main.xml" value="0.1" />
-        <entry key="..\:/Users/Ola Abaza/AndroidStudioProjects/Windy/app/src/main/res/layout/alarm_dialog.xml" value="0.18" />
+        <entry key="..\:/Users/Ola Abaza/AndroidStudioProjects/Windy/app/src/main/res/layout/alarm_dialog.xml" value="0.1" />
         <entry key="..\:/Users/Ola Abaza/AndroidStudioProjects/Windy/app/src/main/res/layout/alarm_fragment.xml" value="0.14" />
         <entry key="..\:/Users/Ola Abaza/AndroidStudioProjects/Windy/app/src/main/res/layout/alarm_item.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/Ola Abaza/AndroidStudioProjects/Windy/app/src/main/res/layout/content_scrolling.xml" value="0.1" />

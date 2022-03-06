@@ -19,14 +19,14 @@ class SettingViewModel @Inject constructor(
     val getSelectedTimeZone = _getSelectedTimeZone.asSharedFlow()
 
     fun getWeatherData(
-        lat: Float,
-        lon: Float,
+        lat: Double,
+        lon: Double,
         lang: String,
         unit: String
     ) {
         viewModelScope.launch {
             _getSelectedTimeZone.emit(
-                repository.fetchWeatherData(lat.toDouble(), lon.toDouble(), lang, unit)
+                repository.fetchWeatherData(lat, lon, lang, unit)
             )
         }
     }

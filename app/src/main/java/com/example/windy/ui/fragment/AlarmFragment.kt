@@ -15,12 +15,11 @@ import android.view.WindowManager
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.example.windy.R
 import com.example.windy.databinding.AlarmDialogBinding
 import com.example.windy.databinding.AlarmFragmentBinding
 import com.example.windy.extensions.action
-import com.example.windy.extensions.showSnackbar
+import com.example.windy.extensions.collectLatestLifeCycleFlow
 import com.example.windy.extensions.toast
 import com.example.windy.models.Alarm
 import com.example.windy.receiver.AlarmReceiver
@@ -33,7 +32,6 @@ import com.example.windy.util.Constant.SOUND
 import com.example.windy.util.cancelAlarm
 import com.example.windy.util.swipeToDeleteFunction
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -81,25 +79,19 @@ class AlarmFragment : Fragment() {
                 showAlarmDialog(null)
             }
         }
-        lifecycleScope.launchWhenStarted {
-            viewModel.getAlarmItem.collectLatest { alarm ->
-                context?.let { _ ->
-                    setAlarm(
-                        alarm.id,
-                        alarmStartTime,
-                        alarmEndTime,
-                        alarm.event,
-                        alarm.sound
-                    )
-                }
-            }
+        collectLatestLifeCycleFlow(viewModel.getAlarmItem) { alarm ->
+            setAlarm(
+                alarm.id,
+                alarmStartTime,
+                alarmEndTime,
+                alarm.event,
+                alarm.sound
+            )
         }
-        lifecycleScope.launchWhenStarted {
-            viewModel.navigateToSelectedProperty.collectLatest { alarmItem ->
-                alarmItem?.let {
-                    alarmId = alarmItem.id
-                    showAlarmDialog(alarmItem)
-                }
+        collectLatestLifeCycleFlow(viewModel.navigateToSelectedProperty) { alarmItem ->
+            alarmItem?.let {
+                alarmId = alarmItem.id
+                showAlarmDialog(alarmItem)
             }
 
         }
@@ -174,7 +166,7 @@ class AlarmFragment : Fragment() {
     }
 
     private fun showSnackBar(alarm: Alarm, position: Int) {
-        binding.alarmLayout.showSnackbar(R.string.deleted) {
+        binding.alarmLayout.showSnackBar(R.string.deleted) {
             action(R.string.undo, {
                 viewModel.insertAlarmItem(alarm)
                 binding.rvAlarms.scrollToPosition(position)

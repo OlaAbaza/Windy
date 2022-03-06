@@ -10,15 +10,11 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.windy.R
 import com.example.windy.databinding.FavDialogBinding
 import com.example.windy.databinding.FavoriteFragmentBinding
-import com.example.windy.extensions.action
-import com.example.windy.extensions.showCheckNetworkDialog
-import com.example.windy.extensions.showSnackbar
-import com.example.windy.extensions.toast
+import com.example.windy.extensions.*
 import com.example.windy.models.domain.WeatherConditions
 import com.example.windy.network.WeatherApiFilter
 import com.example.windy.ui.adapter.DailyListAdapter
@@ -30,7 +26,6 @@ import com.example.windy.util.SharedPreferenceUtil
 import com.example.windy.util.isConnected
 import com.example.windy.util.swipeToDeleteFunction
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -95,14 +90,14 @@ class FavoriteFragment : Fragment() {
                 }
             }
         }
-        lifecycleScope.launchWhenStarted {
-            viewModel.navigateToSelectedProperty.collectLatest {
-                it?.let {
-                    showWeatherDetailsDialog(it)
-                    viewModel.doneNavigating()
-                }
+
+        collectLatestLifeCycleFlow(viewModel.navigateToSelectedProperty) { item ->
+            item?.let {
+                showWeatherDetailsDialog(item)
+                viewModel.doneNavigating()
             }
         }
+
         return binding.root
     }
 
@@ -134,7 +129,7 @@ class FavoriteFragment : Fragment() {
     }
 
     private fun showSnackBar(weatherConditions: WeatherConditions, position: Int) {
-        binding.favLayout.showSnackbar(R.string.deleted) {
+        binding.favLayout.showSnackBar(R.string.deleted) {
             action(R.string.undo, {
                 viewModel.getWeatherData(
                     (weatherConditions.lat).toFloat(),

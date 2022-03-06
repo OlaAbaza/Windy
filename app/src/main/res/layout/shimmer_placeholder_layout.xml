@@ -7,7 +7,6 @@
     android:layout_height="match_parent">
 
     <com.facebook.shimmer.ShimmerFrameLayout
-        android:id="@+id/shimmerLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -101,7 +100,6 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:id="@+id/menu_fav"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_margin="5dp"
@@ -109,7 +107,6 @@
                 android:elevation="10dp" />
 
             <ImageView
-                android:id="@+id/menu_alarm"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_margin="5dp"
@@ -117,7 +114,6 @@
                 android:elevation="10dp" />
 
             <ImageView
-                android:id="@+id/menu_map"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_margin="5dp"
@@ -125,7 +121,6 @@
                 android:elevation="10dp" />
 
             <ImageView
-                android:id="@+id/menu_setting"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_margin="5dp"

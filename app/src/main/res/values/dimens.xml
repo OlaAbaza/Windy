@@ -1,7 +1,8 @@
 <resources>
-    <dimen name="app_bar_height">300dp</dimen>
-    <dimen name="fab_margin">16dp</dimen>
-    <dimen name="text_margin">16dp</dimen>
-    <dimen name="Headline">35sp</dimen>
-    <dimen name="widget_margin">0dp</dimen>
+    <dimen name="dimen_35">35sp</dimen>
+    <dimen name="dimen_20">20dp</dimen>
+    <dimen name="dimen_15">15dp</dimen>
+    <dimen name="dimen_10">10dp</dimen>
+    <dimen name="dimen_19">19dp</dimen>
+    <dimen name="dimen_30">30dp</dimen>
 </resources>

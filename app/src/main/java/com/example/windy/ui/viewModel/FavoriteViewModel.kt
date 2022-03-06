@@ -22,7 +22,7 @@ class FavoriteViewModel @Inject constructor(
 
 
     val weatherConditionsList by lazy {
-        repository.weatherConditions.asLiveData()
+        repository.getWeatherConditions().asLiveData()
     }
 
     fun getWeatherData(

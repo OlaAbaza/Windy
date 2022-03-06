@@ -14,32 +14,33 @@
         android:layout_height="wrap_content"
         android:background="#F3F2F7"
         android:focusableInTouchMode="false"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="15dp"
+        app:cardCornerRadius="@dimen/dimen_20"
+        app:cardElevation="@dimen/dimen_15"
         app:cardUseCompatPadding="true">
 
         <ImageView
             android:id="@+id/closeBtn"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
+            android:layout_width="@dimen/dimen_35"
+            android:layout_height="@dimen/dimen_35"
             android:layout_gravity="end"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="19dp"
-            android:elevation="10dp"
-            android:src="@drawable/ic_baseline_cancel_24" />
+            android:layout_marginTop="@dimen/dimen_10"
+            android:layout_marginEnd="@dimen/dimen_19"
+            android:elevation="@dimen/dimen_10"
+            android:src="@drawable/ic_baseline_cancel_24"
+            android:contentDescription="@string/dismiss_button" />
 
         <LinearLayout
             android:id="@+id/my_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="@dimen/dimen_30"
             android:orientation="vertical">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
+                android:layout_margin="@dimen/dimen_10"
                 android:background="@color/textview_bg"
                 app:hintTextColor="@color/purple_504">
 
@@ -47,9 +48,9 @@
                     android:id="@+id/Desc_tv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="@dimen/dimen_10"
+                    android:layout_marginTop="@dimen/dimen_10"
+                    android:layout_marginEnd="@dimen/dimen_10"
                     android:background="@color/textview_bg"
                     android:hint="@string/description"
                     android:inputType="textPersonName"

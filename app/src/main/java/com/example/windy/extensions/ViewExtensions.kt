@@ -9,14 +9,21 @@ import android.provider.Settings
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.StringRes
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.windy.R
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 fun Context.toast(message: CharSequence, length: Int = Toast.LENGTH_SHORT) =
     Toast.makeText(this, message, length).show()
 
-fun View.isVisibile(): Boolean = visibility == View.VISIBLE
+fun View.isVisible(): Boolean = visibility == View.VISIBLE
 
 fun View.isGone(): Boolean = visibility == View.GONE
 
@@ -34,7 +41,7 @@ fun View.makeInvisible() {
     visibility = View.INVISIBLE
 }
 
-fun View.showSnackbar(
+fun View.showSnackBar(
     @StringRes messageRes: Int,
     length: Int = Snackbar.LENGTH_LONG,
     action: Snackbar.() -> Unit
@@ -86,6 +93,15 @@ fun Activity.showCheckNetworkDialog() {
             dialog.dismiss()
         }
         .show()
+}
+
+
+fun <T> Fragment.collectLatestLifeCycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
+    lifecycleScope.launch {
+        repeatOnLifecycle(Lifecycle.State.STARTED) {
+            flow.collectLatest(collect)
+        }
+    }
 }
 
 

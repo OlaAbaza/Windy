@@ -5,12 +5,13 @@ import android.content.Context
 import android.content.Intent
 import com.example.windy.R
 import com.example.windy.models.domain.WeatherConditions
-import com.example.windy.repository.WeatherRepository
+import com.example.windy.repository.WeatherRepositoryImpl
 import com.example.windy.util.Constant.ALARM_END_TIME
 import com.example.windy.util.Constant.ALARM_ID
 import com.example.windy.util.Constant.EVENT
 import com.example.windy.util.Constant.SOUND
 import com.example.windy.util.NotificationUtils
+import com.example.windy.util.Resource
 import com.example.windy.util.SharedPreferenceUtil
 import com.example.windy.util.cancelAlarm
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,7 +27,7 @@ class AlarmReceiver : BroadcastReceiver() {
     lateinit var sharedPreferences: SharedPreferenceUtil
 
     @Inject
-    lateinit var repository: WeatherRepository
+    lateinit var repository: WeatherRepositoryImpl
 
     @Inject
     lateinit var notificationUtilsUtils: NotificationUtils
@@ -49,7 +50,13 @@ class AlarmReceiver : BroadcastReceiver() {
             val timeZone = sharedPreferences.getTimeZone()
             var weatherConditionsItem: WeatherConditions? = null
             val jop = CoroutineScope(Dispatchers.IO).launch {
-                weatherConditionsItem = timeZone?.let { repository.getObjByTimezone(it).data }
+                weatherConditionsItem =
+                    when (val response = timeZone?.let { repository.getObjByTimezone(it) }) {
+                        is Resource.Success -> {
+                            response.data
+                        }
+                        else -> null
+                    }
             }
             jop.invokeOnCompletion {
                 val weatherDesc = weatherConditionsItem?.current?.weather?.get(0)?.description
